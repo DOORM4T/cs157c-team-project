@@ -1,0 +1,11 @@
+# IMPORTANT! This docker file is DOES NOT have sharding & replication across 3+ nodes set up.
+# We'll probably need to do the set up manually & export custom Docker images
+
+services:
+  mongo:
+    image: mongo
+    ports:
+      - 28017:27017
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=team
+      - MONGO_INITDB_ROOT_PASSWORD=nosql
