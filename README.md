@@ -10,6 +10,7 @@ Team NoSequel (CS 157C Section 4)
 ### To-do
 - Pick a data set (Suggestion: http://openflights.org/data.html#airport:%5Boriginal%5D)
   - Must be 1GB+
+  - Process it & save it in our local MongoDB instance
 - Determine use cases 
 - Set up 5+ queries (can test via mongosh, no need to implement in our app yet). Must have at least one of each:  
     - Create
