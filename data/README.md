@@ -13,5 +13,11 @@ node . airports-extended.dat.txt
 - This will output the processed data to ``out/<timestamp>.csv``
 - It will also log the estimated size of the processed data
 
+## Import processed data to MongoDB
+```bash
+# After copying the processed csv file to a node running MongoDB...
+mongoimport --file processed.csv --type csv --fields airport_id,name,city,country,iata,icao,latitude,longitude,altitude,timezone,dst,tz,type,source --db project --collection openflight --username <username> --password <password> --authenticationDatabase admin
+```
+
 ## Resources
 - airports-extended.dat.txt from https://openflights.org/data.html#airport:%5Boriginal%5D
