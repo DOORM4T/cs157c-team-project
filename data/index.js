@@ -3,6 +3,7 @@ import ora from 'ora'
 import { join } from "path"
 import readline from "readline"
 import { getFileSizeBytes } from "./getFileSizeBytes.js"
+import tsvtojson from 'tsvtojson'
 
 const args = process.argv.slice(2)
 
