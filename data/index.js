@@ -10,11 +10,11 @@ const SPINNER_BASE_TEXT = "Processing..."
 const spinner = ora({ text: SPINNER_BASE_TEXT, color: "yellow" })
 
 
-const FIELDS = "airport_id,name,city,country,iata,icao,latitude,longitude,altitude,timezone,dst,tz,type,source".split(",")
+const INPUT_FIELDS = "airport_id,name,city,country,iata,icao,latitude,longitude,altitude,timezone,dst,tz,type,source".split(",")
 
 const SYNTH_PLACES = "Runway,Taxiway,Apron,Terminal Building,Control Tower,Hanger,Fire Station,Parking".split(",")
 const SYNTH_SUBPLACE = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("")
-const SYNTH_SUBPLACE_2 = "SECTION 1,SECTION 2,SECTION 3".split(",")
+const SYNTH_SUBPLACE_2 = "SECTION 1,SECTION 2".split(",")
 
 const SYNTH_NAMES = []
 
@@ -47,9 +47,8 @@ function main() {
 
         mkdirSync(dir, { recursive: true })
 
-        const outputFile = join(dir, "processed.csv")
+        const outputFile = join(dir, "processed.tsv")
         const ws = createWriteStream(outputFile, { encoding: "utf-8" })
-        ws.write(FIELDS.join(",") + "\n")
 
         const lineByLine = readline.createInterface({ input: createReadStream(path) })
 
@@ -61,14 +60,15 @@ function main() {
 
             const lineData = {}
             entries.forEach((entry, index) => {
-                const field = FIELDS[index]
+                const field = INPUT_FIELDS[index]
                 lineData[field] = entry
             })
+            withLatLngReplacedByGeoJson(lineData)
 
-            ws.write(jsonToCsvLine(lineData) + "\n")
+            ws.write(jsonToTsvLine(lineData) + "\n")
 
             const synthesized = generateSimilarRandomData(lineData, SYNTH_NAMES)
-            const synthesizedCsvLines = synthesized.map(jsonToCsvLine)
+            const synthesizedCsvLines = synthesized.map(jsonToTsvLine)
             synthesizedCsvLines.forEach(line => {
                 count++
                 ws.write(line + "\n")
@@ -118,25 +118,36 @@ function generateSimilarRandomData(lineData, toAppend = []) {
 
     for (let i = 0; i < toAppend.length; i++) {
         const synthData = { ...lineData }
-        synthData["airport_id"] = lineData["airport_id"] + i
+        synthData["airport_id"] = lineData["airport_id"] + "S" + i
         synthData["name"] = lineData["name"] + " - " + toAppend[i]
         synthData["type"] = toAppend[i]
         synthData["source"] = "synthesized"
+
         synthesizedData.push(synthData)
     }
 
     return synthesizedData
 }
 
-function jsonToCsvLine(json) {
-    let csvLine = ""
+function jsonToTsvLine(json) {
+    let tsvLine = ""
     const values = Object.values(json)
 
     values.forEach((val, index) => {
-        csvLine += val
+        tsvLine += val
         if (index !== values.length - 1) {
-            csvLine += ","
+            tsvLine += "\t"
         }
     })
-    return csvLine
+    return tsvLine
+}
+
+function withLatLngReplacedByGeoJson(data) {
+    const { longitude, latitude, } = data
+    if (!longitude || !latitude) throw new Error(`Missing longitude and/or latitude: airport ${data["airport_id"]}`)
+
+    const lonLat = { type: "Point", coordinates: [longitude, latitude] }
+    delete data["longitude"]
+    delete data["latitude"]
+    data["lonLat"] = JSON.stringify(lonLat)
 }

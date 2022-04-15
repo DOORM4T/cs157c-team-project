@@ -16,7 +16,7 @@ node . airports-extended.dat.txt
 ## Import processed data to MongoDB
 ```bash
 # After copying the processed csv file to a node running MongoDB...
-mongoimport --file processed.csv --type csv --fields airport_id,name,city,country,iata,icao,latitude,longitude,altitude,timezone,dst,tz,type,source --db project --collection openflight --username <username> --password <password> --authenticationDatabase admin
+mongoimport --file processed.tsv --type tsv --fields airport_id,name,city,country,iata,icao,altitude,timezone,dst,tz,type,source,lonLat --db project --collection openflight --username team --password nosql --authenticationDatabase admin
 ```
 
 ## Resources
