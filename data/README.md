@@ -10,13 +10,13 @@
 ```bash
 node . airports-extended.dat.txt
 ```
-- This will output the processed data to ``out/<timestamp>.csv``
-- It will also log the estimated size of the processed data
+- This will output the processed data to ``out/<timestamp>/processed.json``
+- It will also log the estimated size of the processed data (~1.7 GB)
 
 ## Import processed data to MongoDB
 ```bash
 # After copying the processed csv file to a node running MongoDB...
-mongoimport --file processed.tsv --type tsv --fields airport_id,name,city,country,iata,icao,altitude,timezone,dst,tz,type,source,lonLat --db project --collection openflight --username team --password nosql --authenticationDatabase admin
+mongoimport --file processed.json --db project --collection openflight --username team --password nosql --authenticationDatabase admin 
 ```
 
 ## Resources
