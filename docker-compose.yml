@@ -3,40 +3,40 @@
 
 services:
   node_1:
+    container_name: node_1
     image: mongo
     ports:
       - 30001:27017
     networks:
       - default
     volumes:
-      - ./db/node1:/data/db
+      - ./db/node1:/db
       - ./scripts:/home/scripts
-    entrypoint:
-      - /home/scripts/init-rs.sh
+    entrypoint: ["/home/scripts/init-node.sh", "1"]
 
   node_2:
+    container_name: node_2
     image: mongo
     ports:
       - 30002:27017
     networks:
       - default
     volumes:
-      - ./db/node2:/data/db
+      - ./db/node2:/db
       - ./scripts:/home/scripts
-    entrypoint:
-      - /home/scripts/init-rs.sh
+    entrypoint: ["/home/scripts/init-node.sh", "2"]
 
   node_3:
+    container_name: node_3
     image: mongo
     ports:
       - 30003:27017
     networks:
       - default
     volumes:
-      - ./db/node3:/data/db
+      - ./db/node3:/db
       - ./scripts:/home/scripts
-    entrypoint:
-      - /home/scripts/init-rs.sh
+    entrypoint: ["/home/scripts/init-node.sh", "3"]
 
 networks:
   default:
