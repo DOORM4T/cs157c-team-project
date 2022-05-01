@@ -6,11 +6,41 @@ services:
     image: mongo
     ports:
       - 30001:27017
+    networks:
+      - default
+    volumes:
+      - ./db/node1:/data/db
+      - ./scripts:/home/scripts
+    entrypoint:
+      - /home/scripts/init-rs.sh
+
   node_2:
     image: mongo
     ports:
       - 30002:27017
+    networks:
+      - default
+    volumes:
+      - ./db/node2:/data/db
+      - ./scripts:/home/scripts
+    entrypoint:
+      - /home/scripts/init-rs.sh
+
   node_3:
     image: mongo
     ports:
       - 30003:27017
+    networks:
+      - default
+    volumes:
+      - ./db/node3:/data/db
+      - ./scripts:/home/scripts
+    entrypoint:
+      - /home/scripts/init-rs.sh
+
+networks:
+  default:
+    name: team-nosequel
+
+volumes:
+  scripts:
