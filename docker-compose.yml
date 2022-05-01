@@ -2,10 +2,15 @@
 # We'll probably need to do the set up manually & export custom Docker images
 
 services:
-  mongo:
+  node_1:
     image: mongo
     ports:
-      - 28017:27017
-    environment:
-      - MONGO_INITDB_ROOT_USERNAME=team
-      - MONGO_INITDB_ROOT_PASSWORD=nosql
+      - 30001:27017
+  node_2:
+    image: mongo
+    ports:
+      - 30002:27017
+  node_3:
+    image: mongo
+    ports:
+      - 30003:27017
