@@ -104,11 +104,25 @@ EOF
 
 # Connect the shards to the mongos instance
 mongosh --port 27020 << EOF
-sh.addShard( "a/node_1:26101,node_2:26102,node_3:26103");
-sh.addShard( "b/node_1:26201,node_2:26202,node_3:26203");
-sh.addShard( "c/node_1:26301,node_2:26302,node_3:26303");
+  sh.addShard( "a/node_1:26101,node_2:26102,node_3:26103");
+  sh.addShard( "b/node_1:26201,node_2:26202,node_3:26203");
+  sh.addShard( "c/node_1:26301,node_2:26302,node_3:26303");
 EOF
 
+# Enable sharding
+# Ranged shard key on country field
+echo "Creating ranged shard key..."
+mongosh --port 27020 << EOF
+  sh.enableSharding("project");
+  sh.shardCollection("project.openflight", { country : 1 } );
+EOF
+
+# Create 2dsphere index on lonLat field (so we can use GeoJSON queries)
+echo "Creating index on lonLat..."
+mongosh --port 27020 << EOF
+  use openflight;
+  db.openflight.createIndex({lonLat:"2dsphere"});
+EOF
 
 echo "Successfully configured Node $NODE_ID"
 
