@@ -15,28 +15,38 @@ import { getFileSizeBytes } from "./getFileSizeBytes.js";
 
 const args = process.argv.slice(2);
 
-const SPINNER_BASE_TEXT = "Processing...";
-const spinner = ora({ text: SPINNER_BASE_TEXT, color: "yellow" });
+const spinner = ora({ color: "yellow" });
 
-const INPUT_FIELDS =
-  "airport_id,name,city,country,iata,icao,latitude,longitude,altitude,timezone,dst,tz,type,source".split(
-    ","
-  );
+const INPUT_FIELDS = {
+  airport_id: "string",
+  name: "string",
+  city: "string",
+  country: "string",
+  iata: "string",
+  icao: "string",
+  latitude: "number",
+  longitude: "number",
+  altitude: "number",
+  timezone: "string",
+  dst: "string",
+  tz: "string",
+  type: "string",
+  source: "string",
+};
+
+const INPUT_FIELD_NAMES = Object.keys(INPUT_FIELDS);
 
 const SYNTH_PLACES =
-  "Runway,Taxiway,Apron,Terminal Building,Control Tower,Hanger,Fire Station,Parking".split(
+  "Runway,Taxiway,Apron,Terminal Building,Control Tower,Hanger,Fire Station,Parking,Customs,Gift Shop,Restaurant,".split(
     ","
   );
 const SYNTH_SUBPLACE = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
-const SYNTH_SUBPLACE_2 = "SECTION 1,SECTION 2".split(",");
 
 const SYNTH_NAMES = [];
 
 SYNTH_PLACES.forEach((place) => {
   SYNTH_SUBPLACE.forEach((subplace) => {
-    SYNTH_SUBPLACE_2.forEach((subplace2) => {
-      SYNTH_NAMES.push(`${place} - ${subplace} - ${subplace2}`);
-    });
+    SYNTH_NAMES.push(`${place} - ${subplace}`);
   });
 });
 
@@ -69,9 +79,11 @@ const transform = new Transform({
 main();
 
 function main() {
+  let spinnerMessage = "Processing...";
   let timeElapsedS = 0;
   const timer = setInterval(() => {
     timeElapsedS += 1;
+    spinner.text = `${spinnerMessage} | ${timeElapsedS}s elapsed`;
   }, 1000);
 
   const timestamp = new Date().valueOf().toString();
@@ -81,80 +93,87 @@ function main() {
     const path = args[0];
     if (!path) throw new Error("Missing path argument");
 
+    const doSynth = args[1] !== "no-synth";
+
     if (!existsSync(path)) {
       throw new Error(`Invalid path argument: ${path}`);
     }
 
     mkdirSync(dir, { recursive: true });
 
-    const outputCsvPath = join(dir, "processed.csv");
-    const outputJsonPath = join(dir, "processed.json");
+    const outputCsvPath = join(
+      dir,
+      doSynth ? "processed.csv" : "processed-no-synth.csv"
+    );
+    const outputJsonPath = join(
+      dir,
+      doSynth ? "processed.json" : "processed-no-synth.json"
+    );
     const ws = createWriteStream(outputCsvPath, { encoding: "utf-8" });
-
-    const lineByLine = readline.createInterface({
-      input: createReadStream(path),
-    });
-
+    const rs = createReadStream(path, { encoding: "utf-8" });
     let count = 0;
-    lineByLine.on("line", (line) => {
-      count++;
-      const noQuotes = line.replace(/\"/g, "");
-      const entries = noQuotes.split(",");
 
-      const lineData = {};
-      entries.forEach((entry, index) => {
-        const field = INPUT_FIELDS[index];
-        lineData[field] = entry;
-      });
+    synthesizeData();
 
-      ws.write(jsonToCsvLine(lineData) + "\n");
-
-      const synthesized = generateSimilarRandomData(lineData, SYNTH_NAMES);
-      const synthesizedCsvLines = synthesized.map(jsonToCsvLine);
-      synthesizedCsvLines.forEach((line) => {
-        count++;
-        ws.write(line + "\n");
-      });
-
-      spinner.text = `${SPINNER_BASE_TEXT} | ${timeElapsedS}s elapsed | ${count} lines written so far`;
-    });
-
-    lineByLine.on("close", async () => {
-      ws.close();
-
-      spinner.text = `${SPINNER_BASE_TEXT} | ${timeElapsedS}s elapsed | converting csv to json`;
-
-      const handleJsonRead = () => {
-        spinner.text = `${SPINNER_BASE_TEXT} | ${timeElapsedS}s elapsed | converting csv to json`;
-      };
-      await synthCsvToJson(outputCsvPath, outputJsonPath, handleJsonRead);
-
-      const sizes = await getFileSizeBytes(outputJsonPath);
-      console.log("\n:: SUCCESS ::");
-      console.log(`:: RESULTS WRITTEN TO ${outputJsonPath} ::`);
-      console.log(`:: ESTIMATED SIZE ::`);
-      console.table(
-        Object.entries(sizes).map(([unit, value]) => ({
-          Value: `${value} ${unit}`,
-        }))
+    function synthesizeData() {
+      spinner.start();
+      rs.pipe(
+        csv({
+          noheader: true,
+          headers: INPUT_FIELD_NAMES,
+          downstreamFormat: "line",
+          eol: "\n",
+          output: "json",
+        }).subscribe(onNext, handleError, handleSynthCompleted)
       );
 
-      if (existsSync(outputCsvPath)) {
-        rmSync(outputCsvPath);
+      function onNext(json) {
+        count += 1;
+        const csvLine = jsonToCsvLine(json) + "\n";
+        ws.write(csvLine);
+
+        if (doSynth) {
+          const synthesized = generateSimilarRandomData(json, SYNTH_NAMES);
+          const synthesizedCsvLines = synthesized.map(jsonToCsvLine);
+          synthesizedCsvLines.forEach((line) => {
+            count++;
+            ws.write(line + "\n");
+          });
+        }
       }
 
-      clearInterval(timer);
-      spinner.stop();
+      async function handleSynthCompleted() {
+        ws.close();
 
-      ask.close();
-      process.exit(0);
-    });
+        spinnerMessage = "Converting CSV to JSON...";
+        await synthCsvToJson(outputCsvPath, outputJsonPath);
 
-    lineByLine.on("error", (error) => {
-      throw error;
-    });
+        const sizes = await getFileSizeBytes(outputJsonPath);
+        console.log("\n:: SUCCESS ::");
+        console.log(`:: RESULTS WRITTEN TO ${outputJsonPath} ::`);
+        console.log(`:: ESTIMATED SIZE ::`);
+        console.table(
+          Object.entries(sizes).map(([unit, value]) => ({
+            Value: `${value} ${unit}`,
+          }))
+        );
 
-    spinner.start();
+        if (existsSync(outputCsvPath)) {
+          rmSync(outputCsvPath);
+        }
+
+        clearInterval(timer);
+        spinner.stop();
+
+        ask.close();
+        process.exit(0);
+      }
+
+      function handleError(error) {
+        console.error(error);
+        process.exit(1);
+      }
+    }
   } catch (error) {
     console.error("\n:: PROCESSING FAILED ::");
     console.error(error);
@@ -185,37 +204,37 @@ function generateSimilarRandomData(lineData, toAppend = []) {
 
 function jsonToCsvLine(json) {
   let line = "";
-  const values = Object.values(json);
 
-  values.forEach((val, index) => {
-    line += val;
-    if (index !== values.length - 1) {
+  INPUT_FIELD_NAMES.forEach((field, index) => {
+    const val = json[field];
+
+    if (INPUT_FIELDS[field] === "string") {
+      line += `"${val}"`;
+    } else {
+      line += val;
+    }
+
+    if (index !== INPUT_FIELD_NAMES.length - 1) {
       line += ",";
     }
   });
   return line;
 }
 
-function synthCsvToJson(inputCsvPath, outputPath, onNewLine) {
-  return new Promise((resolve, reject) => {
-    const rs = createReadStream(inputCsvPath, "utf-8");
-    const ws = createWriteStream(outputPath, { flags: "w", encoding: "utf-8" });
+function synthCsvToJson(inputCsvPath, outputPath) {
+  const rs = createReadStream(inputCsvPath, "utf-8");
+  const ws = createWriteStream(outputPath, { flags: "w", encoding: "utf-8" });
 
+  return new Promise((resolve, reject) => {
     rs.pipe(
       csv({
         noheader: true,
-        headers: INPUT_FIELDS,
+        headers: INPUT_FIELD_NAMES,
         downstreamFormat: "line",
-        delimiter: ",",
         eol: "\n",
         output: "json",
       }).subscribe((json) => {
-        onNewLine && onNewLine(json);
-
-        return new Promise((res) => {
-          withLatLngReplacedByGeoJson(json);
-          res();
-        });
+        withLatLngReplacedByGeoJson(json);
       })
     )
       .pipe(transform)
@@ -229,7 +248,7 @@ function withLatLngReplacedByGeoJson(data) {
   const { longitude, latitude } = data;
   const lon = Number(longitude);
   const lat = Number(latitude);
-  if (!lon || !lat)
+  if (isNaN(lon) || isNaN(lat))
     throw new Error(
       `Missing or invalid longitude and/or latitude: airport ${data["airport_id"]}`
     );

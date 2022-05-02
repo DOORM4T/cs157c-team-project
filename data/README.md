@@ -7,17 +7,24 @@
 ## Try it!
 
 ```bash
+# With synthesized data (~1GB)
 node . airports-extended.dat.txt
 ```
 
+```bash
+# Without synthesized data (~3MB)
+node . airports-extended.dat.txt no-synth
+```
+
 - This will output the processed data to `out/<timestamp>/processed.json`
-- It will also log the estimated size of the processed data (~1.7 GB)
+- It will also log the estimated size of the processed data (~1.16 GB)
 
 ## Import processed data to MongoDB
 
 ```bash
-# After copying the processed csv file to a node running MongoDB...
-mongoimport --file processed.json --jsonArray --db project --collection openflight --username team --password nosql --authenticationDatabase admin
+# After starting the cluster...
+# In the project root:
+./import_to_cluster.sh <path-to-data>.json
 ```
 
 ## Resources
