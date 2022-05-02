@@ -24,7 +24,7 @@ node . airports-extended.dat.txt no-synth
 ```bash
 # After starting the cluster...
 # In the project root:
-./import_to_cluster.sh <path-to-data>.json
+./import-to-cluster.sh <path-to-data>.json
 ```
 
 ## Resources
