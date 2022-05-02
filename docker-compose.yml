@@ -6,7 +6,7 @@ services:
     container_name: node_1
     image: mongo
     ports:
-      - 30001:27017
+      - 30001:27020
     networks:
       - default
     volumes:
@@ -17,8 +17,6 @@ services:
   node_2:
     container_name: node_2
     image: mongo
-    ports:
-      - 30002:27017
     networks:
       - default
     volumes:
@@ -29,8 +27,6 @@ services:
   node_3:
     container_name: node_3
     image: mongo
-    ports:
-      - 30003:27017
     networks:
       - default
     volumes:
