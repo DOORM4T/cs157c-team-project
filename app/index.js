@@ -4,11 +4,13 @@ const CreatePoiOperation = require("./operations/1.createPoi");
 const WithinDistanceOperation = require("./operations/14.withinDistance");
 const DistanceBetweenOperation = require("./operations/15.distanceBetween");
 const UpdatePoiOperation = require("./operations/2.updatePoi");
+const DeletePoiOperation = require("./operations/3.deletePoi");
 const ExitApplicationOperation = require("./operations/ExitApplicationOperation");
 
 const operations = [
   new CreatePoiOperation(),
   new UpdatePoiOperation(),
+  new DeletePoiOperation(),
   new DistanceBetweenOperation(),
   new WithinDistanceOperation(),
   new ExitApplicationOperation(),
