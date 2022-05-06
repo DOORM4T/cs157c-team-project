@@ -8,6 +8,7 @@ const DeletePoiOperation = require("./operations/3.deletePoi");
 const GetByPoiId = require("./operations/4.getByPoiId");
 const ListByPoiType = require("./operations/5.listByPoiType");
 const ListByCity = require("./operations/6.listByCity");
+const ListByCountry = require("./operations/7.listByCountry");
 const ExitApplicationOperation = require("./operations/ExitApplicationOperation");
 
 const operations = [
@@ -17,6 +18,7 @@ const operations = [
   new GetByPoiId(),
   new ListByPoiType(),
   new ListByCity(),
+  new ListByCountry(),
   new DistanceBetweenOperation(),
   new WithinDistanceOperation(),
   new ExitApplicationOperation(),
