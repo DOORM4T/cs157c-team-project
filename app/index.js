@@ -1,10 +1,12 @@
 const inquirer = require("inquirer");
 const dbConnect = require("./db");
+const WithinDistanceOperation = require("./operations/14.withinDistance");
 const DistanceBetweenOperation = require("./operations/15.distanceBetween");
 const ExitApplicationOperation = require("./operations/ExitApplicationOperation");
 
 const operations = [
   new DistanceBetweenOperation(),
+  new WithinDistanceOperation(),
   new ExitApplicationOperation(),
 ];
 const operationChoices = operations.map((op) => ({ value: op.name }));
@@ -40,7 +42,7 @@ async function main() {
     try {
       await operationToRun.execute(openflight, connection);
     } catch (error) {
-      console.error(error.message);
+      console.error(error);
     }
     console.log("\n");
   }
