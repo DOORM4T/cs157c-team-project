@@ -3,10 +3,12 @@ const dbConnect = require("./db");
 const CreatePoiOperation = require("./operations/1.createPoi");
 const WithinDistanceOperation = require("./operations/14.withinDistance");
 const DistanceBetweenOperation = require("./operations/15.distanceBetween");
+const UpdatePoiOperation = require("./operations/2.updatePoi");
 const ExitApplicationOperation = require("./operations/ExitApplicationOperation");
 
 const operations = [
   new CreatePoiOperation(),
+  new UpdatePoiOperation(),
   new DistanceBetweenOperation(),
   new WithinDistanceOperation(),
   new ExitApplicationOperation(),
