@@ -9,6 +9,9 @@ const GetByPoiId = require("./operations/4.getByPoiId");
 const ListByPoiType = require("./operations/5.listByPoiType");
 const ListByCity = require("./operations/6.listByCity");
 const ListByCountry = require("./operations/7.listByCountry");
+const ListByTimezone = require("./operations/8.listByTimezone");
+const ListByTz = require("./operations/8.listByTimezone");
+const ListBySource = require("./operations/9.listBySource");
 const ExitApplicationOperation = require("./operations/ExitApplicationOperation");
 
 const operations = [
@@ -19,6 +22,8 @@ const operations = [
   new ListByPoiType(),
   new ListByCity(),
   new ListByCountry(),
+  new ListByTimezone(),
+  new ListBySource(),
   new DistanceBetweenOperation(),
   new WithinDistanceOperation(),
   new ExitApplicationOperation(),
