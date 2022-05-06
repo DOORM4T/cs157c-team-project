@@ -1,6 +1,7 @@
 const inquirer = require("inquirer");
 const dbConnect = require("./db");
 const CreatePoiOperation = require("./operations/1.createPoi");
+const ListByIATA = require("./operations/10.listByIATA");
 const WithinDistanceOperation = require("./operations/14.withinDistance");
 const DistanceBetweenOperation = require("./operations/15.distanceBetween");
 const UpdatePoiOperation = require("./operations/2.updatePoi");
@@ -24,6 +25,7 @@ const operations = [
   new ListByCountry(),
   new ListByTimezone(),
   new ListBySource(),
+  new ListByIATA(),
   new DistanceBetweenOperation(),
   new WithinDistanceOperation(),
   new ExitApplicationOperation(),
