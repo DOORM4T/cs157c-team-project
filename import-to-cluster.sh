@@ -16,4 +16,4 @@ docker cp $DATA_PATH node_1:/home/to_import.json
 
 echo "Importing..."
 docker exec node_1 \
-    mongoimport --file /home/to_import.json --jsonArray --db project --collection openflight --port 27020
+    mongoimport --file /home/to_import.json --jsonArray --db project --collection openflight --port 26101
