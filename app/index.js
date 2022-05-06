@@ -4,6 +4,7 @@ const CreatePoiOperation = require("./operations/1.createPoi");
 const ListByIATA = require("./operations/10.listByIATA");
 const ListByICAO = require("./operations/11.listBYICAO");
 const ListByDST = require("./operations/12.listByDST");
+const ListAll = require("./operations/13.listAll");
 const WithinDistanceOperation = require("./operations/14.withinDistance");
 const DistanceBetweenOperation = require("./operations/15.distanceBetween");
 const UpdatePoiOperation = require("./operations/2.updatePoi");
@@ -30,11 +31,12 @@ const operations = [
   new ListByIATA(),
   new ListByICAO(),
   new ListByDST(),
+  new ListAll(),
   new DistanceBetweenOperation(),
   new WithinDistanceOperation(),
   new ExitApplicationOperation(),
 ];
-const operationChoices = operations.map((op) => ({ value: op.name }));
+const operationChoices = operations.map((op, index) => ({ value: op.name }));
 
 main()
   .then(() => {
