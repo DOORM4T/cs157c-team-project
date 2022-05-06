@@ -2,8 +2,6 @@
 
 Team NoSequel (CS 157C Section 4)
 
-![image](https://user-images.githubusercontent.com/46092255/163021238-bc3dee33-37e3-4718-9372-47f3646ba3de.png)
-
 ### Try it!
 
 1. Install the following:
