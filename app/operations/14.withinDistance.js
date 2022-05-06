@@ -52,10 +52,10 @@ class WithinDistanceOperation extends Operation {
     const resultsTitle = `POI's within ${range} meters of ${poi.name} (airport_id=${id})`;
     console.info(resultsTitle);
 
-    browseCursor(cursor, (result) => {
+    await browseCursor(cursor, (result) => {
       const { airport_id, name, lonLat } = result;
       const distance = getDistance(poi.lonLat.coordinates, lonLat.coordinates);
-      return { airport_id, name, distance };
+      return { airport_id, name, "distance (meters)": distance };
     });
   }
 }
