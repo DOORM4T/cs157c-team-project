@@ -1,6 +1,6 @@
 const { MongoClient } = require("mongodb");
 
-const url = "mongodb://localhost:30001/?directConnection=true";
+const url = "mongodb://localhost:30002/?directConnection=true";
 const client = new MongoClient(url);
 
 async function dbConnect(dbName, collectionName) {

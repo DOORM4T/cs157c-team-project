@@ -119,7 +119,7 @@ EOF
 
 # Create 2dsphere index on lonLat field (so we can use GeoJSON queries)
 echo "Creating index on lonLat..."
-mongosh --port 27020 << EOF
+mongosh --port 26101 << EOF
   use project;
   db.openflight.createIndex({lonLat:"2dsphere"});
 EOF
